@@ -1,7 +1,8 @@
 const { connect, connection } = require('mongoose');
+const { MONGODB_URI } = require('./config');
 
 const connectDB = async () => {
-    await connect('mongodb://localhost:27017/cli-mongodb-app')
+    await connect(MONGODB_URI)
 };
 
 connection.on('error', (err) => {
