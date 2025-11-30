@@ -10,6 +10,8 @@ const rateLimit = require('express-rate-limit');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const reportRouter = require('./src/api/report');
+const auth = require('./routes/auth');
+const reportsRouter = require('./routes/reports');
 
 var app = express();
 
@@ -29,8 +31,16 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use((req, res, next) => {
+  res.locals.user = req.user || null;
+  next();
+});
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+
+// páginas de login y registro
+app.use('/auth', auth);
 
 // ============================
 // 📡 API Rate Limit (solo para /api/report)
@@ -50,6 +60,8 @@ app.use('/api/report', reportLimiter);
 
 // Aplica el router real
 app.use('/api/report', reportRouter);
+
+app.use('/reports', reportsRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -49,7 +49,6 @@ async function apiKeyAuth(req, res, next) {
 
     // 🔥 ESTA ES LA CLAVE 🔥
     req.user = { id: data.user_id };
-
     next();
   } catch (err) {
     console.error('apiKeyAuth error:', err);

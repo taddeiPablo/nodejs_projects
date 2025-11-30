@@ -5,15 +5,22 @@ const supabase = require('../src/lib/supabaseClient');
 
 exports.createReport = async (req, res) => {
     try {
-        const { projectPath, timestamp, summary, files } = req.body;
+        //const { projectPath, timestamp, summary, files, raw_report } = req.body;
+        const { projectPath, timestamp, summary, files, raw_report } = req.body;
+        const userId = req.user.id;
+        console.log(projectPath, timestamp, summary, files, raw_report);
+        if (!raw_report) {
+        return res.status(400).json({ error: "raw_report is required" });
+        }
 
         const { data, error } = await supabase
             .from("reports")
             .insert({
-                project_path: projectPath,
+                user_id: userId,
+                project_root: projectPath,
                 processed_at: timestamp,
                 summary,
-                raw_files: files,
+                raw_report: raw_report,
             })
             .select();
 

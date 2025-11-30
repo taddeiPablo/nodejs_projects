@@ -1,0 +1,47 @@
+extends ../layout
+
+block content
+  h2.mb-4 Bienvenido #{user.email}
+
+  // Resumen rápido
+  .row.mb-4
+    .col-md-4
+      .card.shadow-sm
+        .card-body
+          h5.card-title Total de reportes
+          h3= reports.length
+    .col-md-4
+      .card.shadow-sm
+        .card-body
+          h5.card-title Último reporte
+          if reports.length
+            p= new Date(reports[0].created_at).toLocaleString()
+          else
+            p No hay reportes
+    .col-md-4
+      .card.shadow-sm
+        .card-body
+          h5.card-title Acciones
+          a.btn.btn-dark(href="/reports") Ver reportes
+
+  // Últimos reportes
+  h4.mt-5 Últimos reportes
+
+  if reports.length === 0
+    p No hay reportes aún.
+  else
+    table.table.table-striped.mt-3
+      thead
+        tr
+          th Proyecto
+          th Issues
+          th Fecha
+          th
+      tbody
+        each r in reports.slice(0,5)
+          tr
+            td= r.project_name
+            td= r.files_with_issues
+            td= new Date(r.created_at).toLocaleDateString()
+            td
+              a.btn.btn-sm.btn-outline-dark(href=`/reports/${r.id}`) Ver

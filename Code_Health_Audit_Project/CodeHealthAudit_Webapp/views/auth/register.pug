@@ -1,0 +1,28 @@
+extends ../layout
+
+block content
+  .row.justify-content-center
+    .col-md-4
+      h2.mb-3 Registro
+
+      if error
+        .alert.alert-danger= error
+
+      form(method="POST" action="/auth/register")
+        .mb-3
+          label.form-label Nombre
+          input.form-control(type="text" name="name")
+
+        .mb-3
+          label.form-label Email
+          input.form-control(type="email" name="email" required)
+
+        .mb-3
+          label.form-label Password
+          input.form-control(type="password" name="password" required)
+
+        button.btn.btn-dark.w-100(type="submit") Crear Cuenta
+
+      p.mt-3
+        | ¿Ya tenés cuenta?
+        a(href="/login") Login
