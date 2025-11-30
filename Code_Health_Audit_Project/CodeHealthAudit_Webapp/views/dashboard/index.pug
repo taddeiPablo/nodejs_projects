@@ -1,47 +1,52 @@
-extends ../layout
+extends ../layout-dashboard
 
 block content
-  h2.mb-4 Bienvenido #{user.email}
+  h1 Dashboard
+  p.text-muted Hola #{user.email}, este es tu panel principal.
 
-  // Resumen rápido
-  .row.mb-4
+  // ----- CARDS DE RESUMEN -----
+  .row.mt-4
     .col-md-4
       .card.shadow-sm
         .card-body
-          h5.card-title Total de reportes
-          h3= reports.length
+          h5.card-title 📊 Reportes Totales
+          p.display-6 #{totalReports}
+          a.btn.btn-primary.mt-2(href="/reports") Ver reportes
+
     .col-md-4
       .card.shadow-sm
         .card-body
-          h5.card-title Último reporte
-          if reports.length
-            p= new Date(reports[0].created_at).toLocaleString()
+          h5.card-title 🔑 API Keys Activas
+          p.display-6 #{totalApiKeys}
+          a.btn.btn-secondary.mt-2(href="/api-keys") Gestionar keys
+
+    .col-md-4
+      .card.shadow-sm
+        .card-body
+          h5.card-title 🕒 Último Reporte
+          if latestReport
+            p.text-muted #{latestReport.created_at}
+            a.btn.btn-outline-primary.mt-2(href="/reports") Ver detalles
           else
-            p No hay reportes
-    .col-md-4
-      .card.shadow-sm
-        .card-body
-          h5.card-title Acciones
-          a.btn.btn-dark(href="/reports") Ver reportes
+            p.text-muted No hay reportes aún.
 
-  // Últimos reportes
-  h4.mt-5 Últimos reportes
+  hr.mt-5
 
-  if reports.length === 0
-    p No hay reportes aún.
-  else
+  // ----- ACTIVIDAD RECIENTE -----
+  h3 Actividad reciente
+
+  if recentReports && recentReports.length
     table.table.table-striped.mt-3
       thead
         tr
-          th Proyecto
-          th Issues
+          th ID
           th Fecha
-          th
+          th Path
       tbody
-        each r in reports.slice(0,5)
+        each r in recentReports
           tr
-            td= r.project_name
-            td= r.files_with_issues
-            td= new Date(r.created_at).toLocaleDateString()
-            td
-              a.btn.btn-sm.btn-outline-dark(href=`/reports/${r.id}`) Ver
+            td= r.id
+            td= r.created_at
+            td= r.project_path
+  else
+    p.text-muted No hay reportes recientes.

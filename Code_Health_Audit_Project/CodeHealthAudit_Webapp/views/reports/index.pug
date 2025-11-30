@@ -1,0 +1,26 @@
+extends ../layout-dashboard
+
+block content
+  h1 Mis Reportes
+  p.text-muted Aquí podés ver todos los reportes enviados desde el CLI.
+
+  if reports.length
+    table.table.table-striped.mt-4
+      thead
+        tr
+          th ID
+          th Fecha
+          th Project Path
+          th Acciones
+      tbody
+        each r in reports
+          tr
+            td= r.id
+            td= new Date(r.created_at).toLocaleString()
+            td= r.project_path
+            td
+              a.btn.btn-sm.btn-primary(href=`/reports/${r.id}`)
+                | Ver Detalle
+  else
+    .alert.alert-info.mt-4
+      | No tenés reportes cargados todavía.

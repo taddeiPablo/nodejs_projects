@@ -1,0 +1,15 @@
+extends ../layout-dashboard
+
+block content
+  h1 API Key creada con éxito 🎉
+
+  p.text-muted Copiala ahora — no volverá a mostrarse.
+
+  .alert.alert-warning
+    strong IMPORTANTE: 
+    |  Esta clave se mostrará solo una vez. Guardala en un lugar seguro.
+
+  pre.bg-light.p-3.border.rounded.mt-3
+    | #{rawKey}
+
+  a.btn.btn-secondary.mt-4(href="/api-keys") ← Volver

@@ -1,0 +1,14 @@
+extends ../layout-dashboard
+
+block content
+  h1 Reporte ##{report.id}
+  p.text-muted Fecha: #{new Date(report.created_at).toLocaleString()}
+
+  h4.mt-4 Path del Proyecto
+  p= report.project_path
+
+  h4.mt-4 Informe Completo (JSON)
+  pre.bg-dark.text-white.p-3(style="white-space: pre-wrap; border-radius: 8px;")
+    | #{JSON.stringify(report.raw_report, null, 2)}
+
+  a.btn.btn-secondary.mt-4(href="/reports") ← Volver
