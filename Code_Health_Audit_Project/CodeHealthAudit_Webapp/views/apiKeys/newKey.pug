@@ -1,15 +1,17 @@
 extends ../layout-dashboard
 
 block content
-  h1 API Key creada con éxito 🎉
-
-  p.text-muted Copiala ahora — no volverá a mostrarse.
+  h1 Crear nueva API Key
 
   .alert.alert-warning
-    strong IMPORTANTE: 
-    |  Esta clave se mostrará solo una vez. Guardala en un lugar seguro.
+    strong IMPORTANTE:
+    |  La clave se mostrará solo una vez después de generarla.
 
-  pre.bg-light.p-3.border.rounded.mt-3
-    | #{rawKey}
+  form(method="POST", action="/api-keys/create")
+    .mb-3
+      label.form-label Nombre / Etiqueta
+      input.form-control(type="text", name="label", required)
 
-  a.btn.btn-secondary.mt-4(href="/api-keys") ← Volver
+    .mt-4
+      button.btn.btn-primary(type="submit") Crear API Key
+      a.btn.btn-secondary.ms-2(href="/api-keys") Cancelar

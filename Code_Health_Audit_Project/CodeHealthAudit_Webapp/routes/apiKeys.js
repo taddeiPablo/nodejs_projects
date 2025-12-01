@@ -20,7 +20,7 @@ router.get("/", requireAuth, async (req, res) => {
   });
 });
 
-// FORMULARIO: crear nueva API KEY
+// FORMULARIO: crear nueva API KEY VIEW
 router.get("/new", requireAuth, (req, res) => {
   res.render("apiKeys/newKey", { user: req.user });
 });
@@ -29,11 +29,11 @@ router.get("/new", requireAuth, (req, res) => {
 router.post("/create", requireAuth, async (req, res) => {
   const userId = req.user.id;
 
-  // Generar clave segura: chp_xxxxx
+  // 1. Generar clave segura: chp_xxxxx
   const rawKey = `chp_${crypto.randomBytes(24).toString("hex")}`;
-
   const hashedKey = crypto.createHash("sha256").update(rawKey).digest("hex");
 
+  // 2. Guardar SOLO el hash en la BD
   const { error } = await supabase
     .from("api_keys")
     .insert({
@@ -47,12 +47,14 @@ router.post("/create", requireAuth, async (req, res) => {
     return res.status(500).send("Error al crear la API Key");
   }
 
-  // Importante: mostrar SOLO la clave raw una vez al usuario
-  res.render("apiKeys/newKey", {
+  // 3. Redirigir a la pantalla especial que muestra la clave RAW
+  //return res.redirect(`/api-keys/created?key=${rawKey}`);
+  return res.render("apiKeys/created", {
     user: req.user,
-    rawKey,
+    rawKey
   });
 });
+
 
 // Revocar API Key
 router.post("/:id/revoke", requireAuth, async (req, res) => {
@@ -72,5 +74,23 @@ router.post("/:id/revoke", requireAuth, async (req, res) => {
 
   res.redirect("/api-keys");
 });
+
+// Mostrar clave creada
+router.get("/created", requireAuth, (req, res) => {
+  const rawKey = req.query.key;
+
+  if (!rawKey) {
+    return res.status(400).send("Missing key");
+  }
+
+  /*res.render("apiKeys/created", {
+    user: req.user,
+    key: rawKey,
+  });*/
+  router.get("/created", requireAuth, (req, res) => {
+    return res.redirect("/api-keys"); // Si entran directo, redirigimos a la lista.
+  });
+});
+
 
 module.exports = router;

@@ -4,7 +4,7 @@
   "description": "CLI para analizar la calidad del codigo en proyectos de software.",
   "main": "index.js",
   "bin": {
-    "codeha": "./index.js"
+    "testaudit": "./index.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

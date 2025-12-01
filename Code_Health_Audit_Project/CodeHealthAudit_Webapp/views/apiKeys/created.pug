@@ -1,0 +1,37 @@
+extends ../layout-dashboard
+
+block content
+  h1 API Key creada con éxito 🎉
+
+  p.text-muted Copiala ahora — no volverá a mostrarse.
+
+  .alert.alert-warning
+    strong IMPORTANTE:
+    |  Esta clave se mostrará solo una vez. Guardala en un lugar seguro.
+
+  input#keyInput.form-control(type="password", value=rawKey, readonly)
+
+  button#copyBtn.btn.btn-primary.mt-3 Copiar
+
+  a.btn.btn-secondary.mt-3(href="/api-keys") ← Volver
+
+block scripts
+  script.
+    |const copyBtn = document.getElementById("copyBtn");
+    |const input = document.getElementById("keyInput");
+    |
+    |copyBtn.addEventListener("click", async ()=> {
+    |  try {
+    |    await navigator.clipboard.writeText(input.value);
+    |    copyBtn.textContent = "¡Copiado!";
+    |    copyBtn.classList.replace("btn-primary", "btn-success");
+    |
+    |    setTimeout(() => {
+    |      copyBtn.textContent = "Copiar";
+    |      copyBtn.classList.replace("btn-success", "btn-primary");
+    |    }, 1500);
+    |  } catch (err) {
+    |    console.error("Error al copiar:", err);
+    |    alert("No se pudo copiar");
+    |  }
+    |});

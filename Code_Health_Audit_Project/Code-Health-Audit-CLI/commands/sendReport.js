@@ -18,8 +18,17 @@ export default async function sendReportCommand(reportPath, apiUrl) {
     return;
   }
 
-  const rawReport = fs.readFileSync(reportPath, "utf8");
-  const jsonReport = JSON.parse(rawReport);
+  const raw = fs.readFileSync(reportPath, "utf8");
+  const report = JSON.parse(raw);
+
+  // ⛔ El backend necesita raw_report OBLIGATORIO.
+  const payload = {
+    projectPath: report.projectPath,
+    timestamp: report.timestamp || new Date().toISOString(),
+    summary: report.summary,
+    files: report.files || [],
+    raw_report: report,  // <<<<<< IMPORTANTE
+  };
 
   try {
     const response = await fetch(`${apiUrl}/api/report`, {
@@ -28,7 +37,7 @@ export default async function sendReportCommand(reportPath, apiUrl) {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`,
       },
-      body: JSON.stringify(jsonReport),
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
