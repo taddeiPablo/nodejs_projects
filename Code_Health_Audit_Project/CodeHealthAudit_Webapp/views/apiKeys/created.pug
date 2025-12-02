@@ -17,21 +17,33 @@ block content
 
 block scripts
   script.
-    |const copyBtn = document.getElementById("copyBtn");
-    |const input = document.getElementById("keyInput");
-    |
-    |copyBtn.addEventListener("click", async ()=> {
-    |  try {
-    |    await navigator.clipboard.writeText(input.value);
-    |    copyBtn.textContent = "¡Copiado!";
-    |    copyBtn.classList.replace("btn-primary", "btn-success");
-    |
-    |    setTimeout(() => {
-    |      copyBtn.textContent = "Copiar";
-    |      copyBtn.classList.replace("btn-success", "btn-primary");
-    |    }, 1500);
-    |  } catch (err) {
-    |    console.error("Error al copiar:", err);
-    |    alert("No se pudo copiar");
-    |  }
-    |});
+    document.addEventListener("DOMContentLoaded", () => {
+      console.log("👉 Script cargado");
+    
+      const btn = document.getElementById("copyBtn");
+      const inp = document.getElementById("keyInput");
+    
+      console.log("btn:", btn);
+      console.log("inp:", inp);
+    
+      if (!btn || !inp) {
+        console.warn("❌ No se encontraron elementos para el copiado");
+        return;
+      }
+    
+      btn.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(inp.value);
+          btn.textContent = "¡Copiado!";
+          btn.classList.replace("btn-primary", "btn-success");
+    
+          setTimeout(() => {
+            btn.textContent = "Copiar";
+            btn.classList.replace("btn-success", "btn-primary");
+          }, 1500);
+        } catch (e) {
+          console.error("Error en copiar:", e);
+        }
+      });
+    });
+

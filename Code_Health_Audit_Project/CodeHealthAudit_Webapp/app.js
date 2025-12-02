@@ -20,7 +20,7 @@ var app = express();
 // ============================
 // 🔐 Seguridad básica
 // ============================
-app.use(helmet()); // agrega headers de seguridad
+//app.use(helmet()); // agrega headers de seguridad
 
 
 // view engine setup
@@ -40,7 +40,6 @@ app.use((req, res, next) => {
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-
 // páginas de login y registro
 app.use('/auth', auth);
 

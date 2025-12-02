@@ -1,14 +1,122 @@
 extends ../layout-dashboard
 
 block content
-  h1 Reporte ##{report.id}
-  p.text-muted Fecha: #{new Date(report.created_at).toLocaleString()}
+  h1.mb-4 Detalle del reporte ##{data.id}
 
-  h4.mt-4 Path del Proyecto
-  p= report.project_path
+  // Botón de descarga
+  a.btn.btn-outline-primary.mb-3(
+    href=`/reports/${data.id}/pdf`
+    target="_blank"
+  )
+    i.bi.bi-file-earmark-pdf-fill.me-2
+    | Descargar PDF
 
-  h4.mt-4 Informe Completo (JSON)
-  pre.bg-dark.text-white.p-3(style="white-space: pre-wrap; border-radius: 8px;")
-    | #{JSON.stringify(report.raw_report, null, 2)}
+  .card.mb-4
+    .card-body
+      h5 Información general
+
+      p.mb-1
+        strong Proyecto:
+        |  #{repoName}
+
+      p.mb-1
+        strong Generado el:
+        |  #{formattedDate}
+
+      p.mb-1
+        strong Archivos con problemas:
+        |  #{raw.filesWithIssues || processedFiles.length}
+
+  .card.mb-4
+    .card-body
+      h5.mb-3 Resumen del análisis
+
+      ul
+        li TODOs: #{summary.todos || 0}
+        li FIXMEs: #{summary.fixmes || 0}
+        li Smells: #{summary.smells || 0}
+        li JS Issues: #{summary.js || 0}
+        li UI Issues: #{summary.ui || 0}
+        li OWASP: #{summary.owasp || 0}
+
+  h3.mt-4 Archivos analizados (#{processedFiles.length})
+
+  if !processedFiles.length
+    p.text-muted No se encontraron issues.
+  else
+    #filesAccordion.accordion
+      each file, i in processedFiles
+        .accordion-item.mb-2
+          h2.accordion-header
+            button.accordion-button.collapsed(type="button", data-bs-toggle="collapse", data-bs-target=`#file-${i}`)
+              strong #{file.filename}
+              span.ms-3
+                if file.counts.todos
+                  span.badge.bg-danger.ms-1 #{file.counts.todos} TODO
+                if file.counts.fixmes
+                  span.badge.bg-danger.ms-1 #{file.counts.fixmes} FIX
+                if file.counts.smells
+                  span.badge.bg-warning.ms-1 #{file.counts.smells} Smell
+                if file.counts.jsIssues
+                  span.badge.bg-info.ms-1 #{file.counts.jsIssues} JS
+                if file.counts.uiIssues
+                  span.badge.bg-primary.ms-1 #{file.counts.uiIssues} UI
+                if file.counts.owaspIssues
+                  span.badge.bg-dark.ms-1 #{file.counts.owaspIssues}
+
+          .accordion-collapse.collapse(id=`file-${i}` data-bs-parent="#filesAccordion")
+            .accordion-body
+
+              ul
+                li TODOs: #{file.counts.todos}
+                li FIXMEs: #{file.counts.fixmes}
+                li Smells: #{file.counts.smells}
+                li JS Issues: #{file.counts.jsIssues}
+                li UI Issues: #{file.counts.uiIssues}
+                li OWASP: #{file.counts.owaspIssues}
+
+              if file.counts.todos || file.counts.fixmes || file.counts.smells || file.counts.jsIssues || file.counts.uiIssues || file.counts.owaspIssues
+                table.table.table-bordered.mt-3
+                  thead
+                    tr
+                      th(style="width:150px") Tipo
+                      th Detalle
+                  tbody
+
+                    if file.todos
+                      each t in file.todos
+                        tr
+                          td.text-danger TODO
+                          td #{t.text} (línea #{t.line})
+
+                    if file.fixmes
+                      each f in file.fixmes
+                        tr
+                          td.text-danger FIX
+                          td #{f.text} (línea #{f.line})
+
+                    if file.smells
+                      each s in file.smells
+                        tr
+                          td.text-warning Smell
+                          td #{s.text} (línea #{s.line})
+
+                    if file.jsIssues
+                      each j in file.jsIssues
+                        tr
+                          td.text-info JS Issue
+                          td #{j.type} — #{j.occurrences} ocurrencias
+
+                    if file.uiIssues
+                      each u in file.uiIssues
+                        tr
+                          td.text-primary UI Issue
+                          td #{u.type}
+
+                    if file.owasp
+                      each o in file.owasp
+                        tr
+                          td.text-danger OWASP
+                          td #{o.rule}: #{o.detail}
 
   a.btn.btn-secondary.mt-4(href="/reports") ← Volver
