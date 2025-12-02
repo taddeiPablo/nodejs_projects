@@ -7,28 +7,44 @@ block content
   a.btn.btn-primary.mb-4(href="/api-keys/new") ➕ Crear nueva API Key
 
   if keys.length
-    table.table.table-striped
+    table.table.table-striped.align-middle
       thead
         tr
           th Label
           th Fecha
           th Último uso
           th Estado
-          th Acciones
+          th.text-center Acciones
       tbody
         each key in keys
           tr
             td= key.label
             td= new Date(key.created_at).toLocaleString()
             td= key.last_used_at ? new Date(key.last_used_at).toLocaleString() : "Nunca usada"
+
+            // Estado
             td
               if key.revoked
                 span.badge.bg-danger Revocada
               else
                 span.badge.bg-success Activa
-            td
-              if !key.revoked
-                form(method="POST", action=`/api-keys/${key.id}/revoke`)
-                  button.btn.btn-sm.btn-danger(type="submit") Revocar
+
+            // Acciones
+            td.text-center
+              .d-flex.gap-2.justify-content-center
+
+                // Si está activa → permitir revocar + regenerar
+                if !key.revoked
+                  form(method="POST", action=`/api-keys/${key.id}/revoke`)
+                    button.btn.btn-sm.btn-warning(type="submit") Revocar
+
+                  form(method="POST", action=`/api-keys/${key.id}/regenerate`)
+                    button.btn.btn-sm.btn-info(type="submit") 🔄 Regenerar
+
+                // Si está revocada → solo permitir eliminar
+                if key.revoked
+                  form(method="POST", action=`/api-keys/${key.id}/delete`)
+                    button.btn.btn-sm.btn-danger(type="submit") Eliminar
+
   else
     .alert.alert-info No tenés API Keys creadas aún.
