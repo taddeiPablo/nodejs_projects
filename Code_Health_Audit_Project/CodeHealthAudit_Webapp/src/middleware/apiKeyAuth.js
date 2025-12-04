@@ -22,7 +22,7 @@ async function apiKeyAuth(req, res, next) {
 
     const { data, error } = await supabase
       .from('api_keys')
-      .select('user_id, revoked')
+      .select('id, user_id, revoked')
       .eq('hashed_key', hashed)
       .maybeSingle();
 
@@ -39,15 +39,16 @@ async function apiKeyAuth(req, res, next) {
       return res.status(403).json({ error: 'API key revoked' });
     }
 
-    // update last_used_at asynchronously
-    supabase
+    // 🔥 Ahora la actualización FUNCIONA y nunca da undefined
+    const { error: updateError } = await supabase
       .from('api_keys')
       .update({ last_used_at: new Date().toISOString() })
-      .eq('hashed_key', hashed)
-      .then(() => {})
-      .catch(err => console.warn('Could not update last_used_at', err));
+      .eq('id', data.id);
 
-    // 🔥 ESTA ES LA CLAVE 🔥
+    if (updateError) {
+      console.warn("No se pudo actualizar last_used_at:", updateError);
+    }
+
     req.user = { id: data.user_id };
     next();
   } catch (err) {
