@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const requireAuth = require("../src/middleware/authGuard");
-const { supabase } = require("../src/services/supabase");
+//const { supabase } = require("../src/services/supabase");
+const DashboardController = require("../controllers/dashboardController");
 
-router.get("/", requireAuth, async (req, res) => {
+router.get("/", requireAuth, DashboardController.Information);/*async (req, res) => {
   const userId = req.user.id;
 
   // Obtener todos los reportes del usuario
@@ -32,6 +33,6 @@ router.get("/", requireAuth, async (req, res) => {
     latestReport,
     recentReports: reports ? reports.slice(0, 5) : [],
   });
-});
+});*/
 
 module.exports = router;

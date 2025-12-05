@@ -1,0 +1,18 @@
+extends ../layout-dashboard
+
+block content
+  h1 Perfil de usuario
+
+  .card.mb-4
+    .card-body
+      h5 Información personal
+
+      form(method="POST", action="/profile")
+        .mb-3
+          label.form-label(for="full_name") Nombre completo
+          input.form-control(type="text", id="full_name", name="full_name", value=profile.full_name placeholder="Tu nombre")
+
+        p.text-muted
+          | Email: #{profile}
+
+        button.btn.btn-primary(type="submit") Guardar cambios

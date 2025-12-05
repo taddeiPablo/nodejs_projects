@@ -14,6 +14,7 @@ const auth = require('./routes/auth');
 const reportsRouter = require('./routes/reports');
 const dashboardRouter = require("./routes/dashboard");
 const apiKeysRouter = require("./routes/apiKeys");
+const userProfile = require("./routes/profile");
 
 var app = express();
 
@@ -67,6 +68,8 @@ app.use('/reports', reportsRouter);
 app.use("/dashboard", dashboardRouter);
 
 app.use("/api-keys", apiKeysRouter);
+
+app.use("/profile", userProfile);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

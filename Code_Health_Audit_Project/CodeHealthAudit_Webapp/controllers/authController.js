@@ -75,24 +75,6 @@ exports.register = async (req, res) => {
 
 // === Login ===
 exports.login = async (req, res) => {
-  /*const { email, password } = req.body;
-
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (error) {
-    return res.render("auth/login", { error: error.message });
-  }
-
-  // guardamos la sesión en cookie (token web)
-  res.cookie("sb_access_token", data.session.access_token, {
-    httpOnly: true,
-    sameSite: "lax",
-  });
-
-  res.redirect("/dashboard");*/
   try {
       const { email, password } = req.body;
 
@@ -103,9 +85,14 @@ exports.login = async (req, res) => {
           error: "Credenciales inválidas."
         });
       }
-
+      console.log("datos del usuario logueado");
+      console.log(data.user.email);
+      console.log(data.user.id);
       const token = jwt.sign(
-        { id: data.user.id },
+        { 
+          id: data.user.id,
+          email: data.user.email
+        },
         process.env.JWT_SECRET,
         { expiresIn: "1d" }
       );

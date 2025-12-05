@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const authRequired = require("../src/middleware/authGuard");
-const { supabase } = require("../src/services/supabase");
-const PDFDocument = require("pdfkit");
+const reportsController = require("../controllers/reportsController");
+/*const { supabase } = require("../src/services/supabase");
+const PDFDocument = require("pdfkit");*/
 
 //===================================
 // ============ HELPERS =============
@@ -10,7 +11,7 @@ const PDFDocument = require("pdfkit");
 // capa a parte como utils para poder 
 // utilizarlo en otros lados
 //===================================
-function getRepoName(path) {
+/*function getRepoName(path) {
   if (!path) return "N/A";
   const parts = path.split(/[/\\]+/);
   return parts[parts.length - 1];
@@ -36,11 +37,11 @@ function formatDate(iso) {
   } catch {
     return iso;
   }
-}
+}*/
 //===================================
 
-router.get("/", authRequired, async (req, res) => {
- const userId = req.user.id;
+router.get("/", authRequired, reportsController.reportsFindAll);/*async (req, res) => {
+  const userId = req.user.id;
 
   const { data: reports, error } = await supabase
     .from("reports")
@@ -57,9 +58,9 @@ router.get("/", authRequired, async (req, res) => {
     user: req.user,
     reports,
   });
-});
+});*/
 
-router.get("/:id", authRequired, async (req, res) => {
+router.get("/:id", authRequired, reportsController.reportFindById);/*async (req, res) => {
   const reportId = req.params.id;
   const userId = req.user.id;
 
@@ -99,9 +100,9 @@ router.get("/:id", authRequired, async (req, res) => {
     repoName: getRepoName(raw.projectRoot),
     formattedDate: formatDate(raw.generatedAt)
   });
-});
+});*/
 
-router.get("/:id/pdf", authRequired, async (req, res)=> {
+router.get("/:id/pdf", authRequired, reportsController.exportReportPdf);/*async (req, res)=> {
   const id = req.params.id;
 
   const { data: report, error } = await supabase
@@ -212,6 +213,6 @@ router.get("/:id/pdf", authRequired, async (req, res)=> {
   });
 
   doc.end();
-});
+});*/
 
 module.exports = router;
