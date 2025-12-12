@@ -3,6 +3,7 @@ const supabase = require('../src/lib/supabaseClient');
 //const { supabase } = require("../src/services/supabase");
 const PDFDocument = require("pdfkit");
 const utils = require('../src/helpers/utils');
+const { compararReportes } = require('../src/utils/reportDiff');
 
 const reportsFindAll = async (req, res) => {
     try {
@@ -218,12 +219,85 @@ const createReport = async (req, res) => {
         return res.status(500).json({ error: "Server error" });
     }
 };
+const deleteReport = async (req, res) => {
+    try {
+        const reportId = req.params.id;
+        const userId = req.user.id;
+
+        const { error } = await supabase
+            .from("reports")
+            .delete()
+            .eq("id", reportId)
+            .eq("user_id", userId);
+
+        if (error) {
+            console.error("Error deleting report:", error);
+            return res.status(500).send("No se pudo eliminar el reporte");
+        }
+
+        res.redirect("/reports");
+    } catch (error) {
+        return res.status(500).json({ error: "Server error" });
+    }
+};
+const compareReports = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const baseId = req.params.id;
+        const compareDate = req.query.date;
+
+        if (!compareDate) {
+            return res.status(400).send("Falta ?date=YYYY-MM-DD");
+        }
+
+        // Fetch base report
+        const { data: baseReport, error: e1 } = await supabase
+            .from("reports")
+            .select("*")
+            .eq("id", baseId)
+            .eq("user_id", userId)
+            .single();
+
+        if (e1 || !baseReport) return res.status(404).send("Reporte base no encontrado");
+
+        // Buscar reporte más cercano hacia atrás
+        const { data: candidates, error: e2 } = await supabase
+            .from("reports")
+            .select("*")
+            .eq("user_id", userId)
+            .lte("created_at", compareDate)
+            .order("created_at", { ascending: false })
+            .limit(1);
+
+        if (e2) return res.status(500).send("Error buscando reporte a comparar");
+
+        if (!candidates || candidates.length === 0) {
+            return res.status(404).send("No se encontró ningún reporte en esa fecha o anterior.");
+        }
+
+        const olderReport = candidates[0];
+
+        // Reutilizamos tu algoritmo de diff
+        const results = compararReportes(olderReport.raw_report, baseReport.raw_report);
+
+        res.render("reports/compare", {
+            base: baseReport,
+            older: olderReport,
+            results,
+        });
+    } catch (error) {
+        console.error("💥 EXCEPCIÓN GENERAL EN compareReports:", error);
+        return res.status(500).json({ error: "Server error" });
+    }
+};
 
 module.exports = {
     createReport,
     reportsFindAll,
     reportFindById,
-    exportReportPdf
+    exportReportPdf,
+    deleteReport,
+    compareReports
 }
 
 

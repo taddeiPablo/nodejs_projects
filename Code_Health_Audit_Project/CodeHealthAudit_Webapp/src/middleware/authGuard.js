@@ -12,7 +12,7 @@ module.exports = function authGuard(req, res, next) {
 
     req.user = { 
       id: decoded.id,
-      email: decoded.email 
+      email: decoded.email == null ? "No registrado" : decoded.email 
     };
     next();
     

@@ -1,0 +1,199 @@
+extends ../layout-dashboard
+
+block content
+  h1.mb-4 Comparación de Reportes
+
+  // ============================
+  // Información general
+  // ============================
+  .card.mb-4
+    .card-body
+      h5.mb-3 Información general
+
+      p
+        strong Reporte base:
+        |  #{base.id} — #{new Date(base.created_at).toLocaleString()}
+
+      p
+        strong Reporte comparado contra:
+        |  #{older.id} — #{new Date(older.created_at).toLocaleString()}
+
+      a.btn.btn-secondary.mt-3(href="/dashboard/reports") ← Volver
+
+  // ============================
+  // Resumen global del diff
+  // ============================
+  .card.mb-4
+    .card-body
+      h4.mb-3 Resumen del análisis
+
+      table.table.table-bordered
+        thead
+          tr
+            th Tipo
+            th Anterior
+            th Actual
+            th Diferencia
+        tbody
+          each key in Object.keys(results.summaryDiff)
+            - const row = results.summaryDiff[key];
+            tr
+              td.text-uppercase= key
+              td= row.old
+              td= row.new
+              td
+                if row.diff > 0
+                  span.text-danger +#{row.diff}
+                else if row.diff < 0
+                  span.text-success #{row.diff}
+                else
+                  span.text-muted 0
+
+  // ============================
+  // Detalles por archivo
+  // ============================
+  h3.mt-4.mb-3 Detalle por archivo
+
+  if results.detailed.length === 0
+    p.text-muted No se encontraron diferencias entre los reportes.
+  else
+    .accordion(id="compareAccordion")
+      each file, idx in results.detailed
+        - const uid = `file-${idx}`
+
+        .accordion-item
+          h2.accordion-header
+            button.accordion-button.collapsed(type="button", data-bs-toggle="collapse", data-bs-target=`#${uid}`)
+              | #{file.file}
+
+          .accordion-collapse.collapse(id=uid data-bs-parent="#compareAccordion")
+            .accordion-body
+
+              // Contador por archivo
+              table.table.table-sm.table-bordered.mb-3
+                thead
+                  tr
+                    th Métrica
+                    th Antes
+                    th Ahora
+                    th Diff
+                tbody
+                  tr
+                    td TODOs
+                    td= file.oldCounts.todos
+                    td= file.newCounts.todos
+                    td= file.newCounts.todos - file.oldCounts.todos
+                  tr
+                    td FIXMEs
+                    td= file.oldCounts.fixmes
+                    td= file.newCounts.fixmes
+                    td= file.newCounts.fixmes - file.oldCounts.fixmes
+                  tr
+                    td Smells
+                    td= file.oldCounts.smells
+                    td= file.newCounts.smells
+                    td= file.newCounts.smells - file.oldCounts.smells
+                  tr
+                    td JS Issues
+                    td= file.oldCounts.js
+                    td= file.newCounts.js
+                    td= file.newCounts.js - file.oldCounts.js
+                  tr
+                    td UI Issues
+                    td= file.oldCounts.ui
+                    td= file.newCounts.ui
+                    td= file.newCounts.ui - file.oldCounts.ui
+                  tr
+                    td OWASP
+                    td= file.oldCounts.owasp
+                    td= file.newCounts.owasp
+                    td= file.newCounts.owasp - file.oldCounts.owasp
+
+              // Cambios
+              h5.mt-4 Cambios detectados
+
+              // ------------------------------------------
+              // TODOS
+              // ------------------------------------------
+              if file.todos.added.length || file.todos.removed.length
+                h6.text-primary.mt-3 TODOs
+                if file.todos.added.length
+                  p.text-success Agregados:
+                  ul
+                    each t in file.todos.added
+                      li #{t.text} (línea #{t.line})
+                if file.todos.removed.length
+                  p.text-danger Eliminados:
+                  ul
+                    each t in file.todos.removed
+                      li #{t.text} (línea #{t.line})
+
+              // FIXMEs
+              if file.fixmes.added.length || file.fixmes.removed.length
+                h6.text-primary.mt-3 FIXMEs
+                if file.fixmes.added.length
+                  p.text-success Agregados:
+                  ul
+                    each t in file.fixmes.added
+                      li #{t.text} (línea #{t.line})
+                if file.fixmes.removed.length
+                  p.text-danger Eliminados:
+                  ul
+                    each t in file.fixmes.removed
+                      li #{t.text} (línea #{t.line})
+
+              // Smells
+              if file.smells.added.length || file.smells.removed.length
+                h6.text-primary.mt-3 Smells
+                if file.smells.added.length
+                  p.text-success Agregados:
+                  ul
+                    each t in file.smells.added
+                      li #{t.text} (línea #{t.line})
+                if file.smells.removed.length
+                  p.text-danger Eliminados:
+                  ul
+                    each t in file.smells.removed
+                      li #{t.text} (línea #{t.line})
+
+              // JS Issues
+              if file.jsIssues.added.length || file.jsIssues.removed.length
+                h6.text-primary.mt-3 JS Issues
+                if file.jsIssues.added.length
+                  p.text-success Agregados:
+                  ul
+                    each t in file.jsIssues.added
+                      li #{t.type} — #{t.occurrences} ocurrencias
+                if file.jsIssues.removed.length
+                  p.text-danger Eliminados:
+                  ul
+                    each t in file.jsIssues.removed
+                      li #{t.type} — #{t.occurrences} ocurrencias
+
+              // UI Issues
+              if file.uiIssues.added.length || file.uiIssues.removed.length
+                h6.text-primary.mt-3 UI Issues
+                if file.uiIssues.added.length
+                  p.text-success Agregados:
+                  ul
+                    each t in file.uiIssues.added
+                      li #{t.type}
+                if file.uiIssues.removed.length
+                  p.text-danger Eliminados:
+                  ul
+                    each t in file.uiIssues.removed
+                      li #{t.type}
+
+              // OWASP
+              if file.owasp.added.length || file.owasp.removed.length
+                h6.text-primary.mt-3 OWASP
+                if file.owasp.added.length
+                  p.text-success Agregados:
+                  ul
+                    each t in file.owasp.added
+                      li #{t.rule}: #{t.detail}
+                if file.owasp.removed.length
+                  p.text-danger Eliminados:
+                  ul
+                    each t in file.owasp.removed
+                      li #{t.rule}: #{t.detail}

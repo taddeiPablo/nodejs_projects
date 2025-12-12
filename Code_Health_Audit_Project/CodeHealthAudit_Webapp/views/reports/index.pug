@@ -21,6 +21,33 @@ block content
             td
               a.btn.btn-sm.btn-primary(href=`/reports/${r.id}`)
                 | Ver Detalle
+              form(method="POST", action=`/reports/${r.id}/delete`, style="display:inline")
+                button.btn.btn-sm.btn-danger(type="submit") | Eliminar
+              // compare button
+              button.btn.btn-sm.btn-warning.ms-2(
+                type="button"
+                data-bs-toggle="modal"
+                data-bs-target=`#compareModal-${r.id}`
+              ) Comparar
+          // Modal
+          .modal.fade(id=`compareModal-${r.id}`, tabindex="-1")
+            .modal-dialog
+              .modal-content
+                .modal-header
+                  h5.modal-title Comparar reporte ##{r.id}
+                  button.btn-close(type="button", data-bs-dismiss="modal")
+
+                .modal-body
+                  form(method="GET", action=`/reports/${r.id}/compare`)
+                    .mb-3
+                      label.form-label Reporte base
+                      input.form-control(type="text", value=new Date(r.created_at).toLocaleString(), readonly)
+
+                    .mb-3
+                      label.form-label Fecha del otro reporte a comparar
+                      input.form-control(type="date", name="date", required)
+
+                    button.btn.btn-warning(type="submit") Comparar
   else
     .alert.alert-info.mt-4
       | No tenés reportes cargados todavía.

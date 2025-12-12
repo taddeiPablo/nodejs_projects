@@ -5,14 +5,24 @@ block content
 
   .card.mb-4
     .card-body
-      h5 Información personal
+      h4 Información personal
 
-      form(method="POST", action="/profile")
+      // Avatar
+      if avatarUrl
+        img(src=avatarUrl, alt="Avatar", style="width:120px; height:120px; border-radius:50%; object-fit:cover; margin-bottom:10px;")
+      else
+        div(style="width:120px; height:120px; border-radius:50%; background:#ddd; display:flex; align-items:center; justify-content:center; margin-bottom:10px;")
+          span.text-muted Sin avatar
+
+      form(method="POST", enctype="multipart/form-data")
         .mb-3
-          label.form-label(for="full_name") Nombre completo
-          input.form-control(type="text", id="full_name", name="full_name", value=profile.full_name placeholder="Tu nombre")
+          label.form-label Subir nuevo avatar
+          input.form-control(type="file", name="avatar")
 
-        p.text-muted
-          | Email: #{profile}
+        .mb-3
+          label.form-label Biografía
+          textarea.form-control(name="bio")= profile.bio || ""
+
+        p.text-muted Email: #{profile.email || "No disponible"}
 
         button.btn.btn-primary(type="submit") Guardar cambios
